@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root{
+    --pri-ff: "Inter", sans-serif;
+    --pri-clr: #28CB8B;
+    --sec-clr: #263238;
+    --third-clr: #2194f3;
+    --white-clr: #fff; 
+    --brand-pri-clr: #4CAF4F;
+    --neutral-black: #263238;
+    --neutral-d_grey: #4D4D4D;
+    --neutral-grey: #717171;
+    --neutral-l_grey: #89939E;
+    --neutral-grey-blue: #ABBED1;
+    --neutral-silver: #F5F7FA;
+    --clr-shade1: #43A046;
+    --clr-shade2: #388E3B;
+    --clr-shade3: #237D31;
+    --clr-shade4: #1B5E1F;
+    --clr-shade5: #103E13;
+    --clr-tint1: #66BB69;
+    --clr-tint2: #81C784;
+    --clr-tint3: #A5D6A7;
+    --clr-tint4: #C8E6C9;
+    --clr-tint5: #E8F5E9;
+    --h1-fs: 64px;
+    --h2-fs: 36px;
+    --h3-fs: 28px;
+    --h4-fs: 20px; 
+    --body-fs1: 18px;
+    --body-fs2: 16px;
+    --body-fs3: 14px;
+    --body-fs4: 12px;
+}
+
+*::before, *::after, *{
+    box-sizing: border-box;
+}
+
+*{
+    font-family: var(--pri-ff);
+    font-size: var(--body-fs2);
+    color: var(--neutral-d_grey);
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+ul[class],
+ol[class],
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+a, ul{
+    list-style: none;
+    text-decoration: none;
+}
+
+a{
+    display: block;
+}
+
+a:hover{
+    text-decoration: underline;
+}
+
+button{
+    border: none;
+    background: none;
+}
+
+h1, h1 *{
+    font-size: var(--h1-fs);
+    line-height: 76px;
+    font-weight: 600;
+    color: var(--neutral-d_grey);
+}
+
+h2, h2 *{
+    font-size: var(--h2-fs);
+    font-weight: 600;
+    color: var(--neutral-d_grey);
+}
+
+h3, h3 *{
+    font-size: var(--h3-fs);
+    font-weight: 600;
+    color: var(--neutral-d_grey);
+}
+
+h4, h4 *{
+    font-size: var(--h4-fs);
+    font-weight: 600;
+    color: var(--neutral-d_grey);
+}
+
+@media only screen and (max-width: 1000px){
+    h1, h1 *,
+    h2, h2 *,
+    h3, h3 *,
+    h4, h4 *{
+        line-height: 100%;
+    }
+}
+
+.wrapper{
+    width: 100%;
+    max-width: 1440px;  
+    margin: 0 auto; 
+    position: relative;
+}
+
+/* NAVIGATION */
+#navbar {
+    position: relative;
+    background:var(--white-clr);
+}
+
+.navbar_cont {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 105px;
+}
+
+.navbar_cont ul{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 588px;
+}
+
+.navbar_cont ul li a{
+    color: #263238;
+}
+
+.navbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 0 14px;
+}
+
+.navbar-btn a{
+    width: 91px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 6px;
+}
+
+.navbar-btn .navbar-login{
+    width: 77px;
+    color: var(--brand-pri-clr);
+}
+
+.navbar-btn .navbar-login:hover{
+    background: var(--brand-pri-clr);
+    color: var(--white-clr);
+    text-decoration: none;
+}
+
+.navbar-btn .navbar-signup{
+    background-color: var(--brand-pri-clr);
+    color: var(--white-clr);
+    border-radius: 6px;
+}
+
+.navbar-btn .navbar-signup:hover{
+    text-decoration: none;
+    background: var(--sec-clr);
+}
+
+/* HERO */
+#hero{
+    background-color: var(--neutral-silver);
+}
+
+.hero_cont{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0 104px;
+    padding: 96px 0;
+}
+
+.hero-info{
+    width: 657px;
+}
+
+.hero-info h1 {
+    margin: 0 0 15px;
+}
+
+.hero-info h1 span{
+    display: block;
+    color: var(--brand-pri-clr);
+}
+
+.hero-info p{
+    color: var(--neutral-grey);
+}
+
+.hero-info a{
+    display: block;
+    background: var(--brand-pri-clr);
+    color: var(--white-clr);
+    height: 52px;
+    width: 100%;
+    max-width: 128px;
+    line-height: 52px;
+    text-align: center;
+    border-radius: 4px;
+    margin: 30px 0 0;
+    transition: .3s ease-in-out background;
+}
+
+.hero-info a:hover {
+    text-decoration: none;
+    background-color: var(--clr-tint1);
+}
+
+/* CLIENT BRANDS */
+.client_brands_cont {
+    padding: 40px 144px;
+}
+
+.client-brands-info {
+    text-align: center;
+    margin: 0 0 50px;
+}
