@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Branch Task List</title>
+
+<style>
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+
+  body{
+    font-family:Inter,sans-serif;
+    background:#f3f4f6;
+    height:100vh;
+  }
+
+  /* Floating Button */
+  .floating-btn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    width:56px;
+    height:56px;
+    border:none;
+    border-radius:18px;
+    background:#111827;
+    color:white;
+    font-size:28px;
+    cursor:pointer;
+    box-shadow:0 10px 25px rgba(0,0,0,.18);
+    transition:.2s;
+    z-index:999;
+  }
+
+  .floating-btn:hover{
+    transform:scale(1.06);
+  }
+
+  /* Panel */
+  .task-panel{
+    position:fixed;
+    bottom:88px;
+    right:20px;
+    width:360px;
+    max-height:520px;
+    overflow-y:auto;
+    padding:16px;
+    border-radius:28px;
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(18px);
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
+  }
+
+  .task-panel::-webkit-scrollbar{
+    width:4px;
+  }
+
+  .task-panel::-webkit-scrollbar-thumb{
+    background:#d1d5db;
+    border-radius:10px;
+  }
+
+  .title{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:18px;
+    color:#111827;
+  }
+
+  /* CATEGORY BRANCH */
+  .branch{
+    margin-bottom:22px;
+    position:relative;
+    padding-left:18px;
+  }
+
+  .branch::before{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:12px;
+    bottom:0;
+    width:2px;
+    background:#d1d5db;
+  }
+
+  .branch-title{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:600;
+    color:#374151;
+    margin-bottom:12px;
+    background:white;
+    padding:8px 12px;
+    border-radius:14px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+  }
+
+  .branch-title::before{
+    content:"";
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#111827;
+  }
+
+  /* TASK */
+  .task{
+    position:relative;
+    margin-left:18px;
+    margin-bottom:12px;
+    background:white;
+    border-radius:18px;
+    padding:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+  }
+
+  .task::before{
+    content:"";
+    position:absolute;
+    left:-18px;
+    top:20px;
+    width:18px;
+    height:2px;
+    background:#d1d5db;
+  }
+
+  .task-top{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+
+  .task input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    margin-top:4px;
+    accent-color:#111827;
+    cursor:pointer;
+  }
+
+  .task textarea{
+    flex:1;
+    border:none;
+    resize:none;
+    outline:none;
+    background:transparent;
+    font-size:14px;
+    min-height:44px;
+    max-height:180px;
+    overflow-y:auto;
+    line-height:1.5;
+    word-break:break-word;
+    white-space:pre-wrap;
+    font-family:inherit;
+    color:#111827;
+  }
+
+  .task textarea::placeholder{
+    color:#9ca3af;
+  }
+
+  .completed textarea{
+    text-decoration:line-through;
+    opacity:.45;
+  }
+
+  /* Category Select */
+  .task-category-select,
+  .task-name-input{
+    width:100%;
+    margin-top:10px;
+    padding:10px 12px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:#f3f4f6;
+    font-size:12px;
+    color:#111827;
+  }
+
+  .task-name-input{
+    margin-top:8px;
+  }
+
+  .task-footer{
+    margin-top:10px;
+    display:flex;
+    justify-content:flex-end;
+  }
+
+  .delete-btn{
+    border:none;
+    background:#f3f4f6;
+    width:28px;
+    height:28px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.2s;
+  }
+
+  .delete-btn:hover{
+    background:#fee2e2;
+  }
+
+  .empty{
+    text-align:center;
+    color:#9ca3af;
+    padding:20px 0;
+    font-size:13px;
+  }
+</style>
+</head>
+<body>
+
+<button class="floating-btn" id="addTask">+</button>
+
+<div class="task-panel">
+  <div class="title">Task Branches</div>
+  <div id="taskList"></div>
+</div>
+
+<script>
+  const taskList = document.getElementById("taskList");
+  const addTaskBtn = document.getElementById("addTask");
+
+  let tasks = JSON.parse(localStorage.getItem("branchTasks")) || [];
+
+  function saveTasks(){
+    localStorage.setItem("branchTasks", JSON.stringify(tasks));
+  }
+
+  function autoResize(textarea){
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  }
+
+  function renderTasks(){
+
+    taskList.innerHTML = "";
+
+    if(tasks.length === 0){
+      taskList.innerHTML = `
+        <div class="empty">No tasks yet</div>
+      `;
+      return;
+    }
+
+    // GROUP BY CATEGORY
+    const grouped = {};
+
+    tasks.forEach(task => {
+
+      const category = task.name || "Uncategorized";
+
+      if(!grouped[category]){
+        grouped[category] = [];
+      }
+
+      grouped[category].push(task);
+    });
+
+    Object.keys(grouped).forEach(category => {
+
+      const branch = document.createElement("div");
+      branch.className = "branch";
+
+      branch.innerHTML = `
+        <div class="branch-title">
+          ${category}
+        </div>
+      `;
+
+      grouped[category].forEach(task => {
+
+        const index = tasks.indexOf(task);
+
+        const categories = [
+          ...new Set(
+            tasks
+              .map(t => t.name)
+              .filter(Boolean)
+          )
+        ];
+
+        const taskEl = document.createElement("div");
+        taskEl.className = `task ${task.completed ? "completed" : ""}`;
+
+        taskEl.innerHTML = `
+          <div class="task-top">
+            <input type="checkbox" ${task.completed ? "checked" : ""}>
+
+            <textarea placeholder="New task...">${task.text}</textarea>
+          </div>
+
+          <select class="task-category-select">
+            <option value="">Select category...</option>
+
+            ${categories.map(cat => `
+              <option 
+                value="${cat}"
+                ${task.name === cat ? "selected" : ""}
+              >
+                ${cat}
+              </option>
+            `).join("")}
+          </select>
+
+          <input 
+            type="text"
+            class="task-name-input"
+            placeholder="Or create new category..."
+          >
+
+          <div class="task-footer">
+            <button class="delete-btn">✕</button>
+          </div>
+        `;
+
+        const checkbox = taskEl.querySelector("input[type='checkbox']");
+        const textarea = taskEl.querySelector("textarea");
+        const categorySelect = taskEl.querySelector(".task-category-select");
+        const nameInput = taskEl.querySelector(".task-name-input");
+        const deleteBtn = taskEl.querySelector(".delete-btn");
+
+        autoResize(textarea);
+
+        // Edit text
+        textarea.addEventListener("input", () => {
+
+          autoResize(textarea);
+
+          tasks[index].text = textarea.value;
+
+          saveTasks();
+        });
+
+        // Existing category
+        categorySelect.addEventListener("change", () => {
+
+          tasks[index].name = categorySelect.value;
+
+          saveTasks();
+          renderTasks();
+        });
+
+        // New category
+        nameInput.addEventListener("keydown", (e) => {
+
+          if(e.key === "Enter"){
+
+            e.preventDefault();
+
+            if(nameInput.value.trim() !== ""){
+
+              tasks[index].name = nameInput.value.trim();
+
+              saveTasks();
+              renderTasks();
+            }
+          }
+        });
+
+        // Complete
+        checkbox.addEventListener("change", () => {
+
+          tasks[index].completed = checkbox.checked;
+
+          saveTasks();
+          renderTasks();
+        });
+
+        // Delete
+        deleteBtn.addEventListener("click", () => {
+
+          tasks.splice(index, 1);
+
+          saveTasks();
+          renderTasks();
+        });
+
+        branch.appendChild(taskEl);
+      });
+
+      taskList.appendChild(branch);
+    });
+  }
+
+  // Add Task
+  addTaskBtn.addEventListener("click", () => {
+
+    tasks.unshift({
+      text:"",
+      completed:false,
+      name:""
+    });
+
+    saveTasks();
+    renderTasks();
+  });
+
+  renderTasks();
+</script>
+
+</body>
+</html>
